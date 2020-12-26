@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temperature Calculator</title>
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    const scaleNames = {
+      celsius: 'Цельсия',
+      fahrenheit: 'Фаренгейта'
+    };
+
+    class TemperatureInput extends React.Component {
+
+      changeTemperatureHandler = (evt) => {
+        this.props.changeTemperature(this.props.scale, evt.target.value);
+      };
+
+      render() {
+        const {
+          scale,
+          value,
+          changeTemperature
+        } = this.props;
+
+        console.info(this.props)
+
+        return (
+          <div>
+            <label>Введите температуру в градусах {scaleNames[scale]}:</label>
+            <input
+              type='number'
+              onChange={evt => changeTemperature(scale, evt.target.value)}
+              value={value}
+            />
+          </div>
+        );
+      }
+    }
+
+    class App extends React.Component {
+
+      state = {
+        temperatureInCelsius: 0,
+        temperatureInFahrenheit: 32
+      }
+
+      toCelsius = value => (value - 32) * 5 / 9;
+      toFahrenheit = value => (value * 9 / 5) + 32;
+      formatValue = value => parseFloat(value).toFixed(2);
+
+      changeTemperatureHandler = (scale, value) => {
+
+        console.info(value, scale);
+
+        if (scale === 'celsius') {
+          const convertedValue = this.toFahrenheit(value)
+          this.setState({
+            temperatureInCelsius: this.formatValue(value),
+            temperatureInFahrenheit: this.formatValue(convertedValue)
+          });
+        } else {
+          const convertedValue = this.toCelsius(value)
+          this.setState({
+            temperatureInCelsius: this.formatValue(convertedValue),
+            temperatureInFahrenheit: this.formatValue(value)
+          });
+        }
+      }
+
+      render() {
+        const {
+          temperatureInCelsius,
+          temperatureInFahrenheit
+        } = this.state;
+        return (
+          <div>
+            <TemperatureInput
+              scale='celsius'
+              value={temperatureInCelsius}
+              changeTemperature={this.changeTemperatureHandler}
+            />
+            <TemperatureInput
+              scale='fahrenheit'
+              value={temperatureInFahrenheit}
+              changeTemperature={this.changeTemperatureHandler}
+            />
+          </div >
+        );
+      }
+
+    }
+    ReactDOM.render(<App />, document.getElementById('root'))
+  </script>
+</body>
+
+</html>
